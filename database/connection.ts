@@ -52,6 +52,6 @@ export async function getDatosJugador(p: sql.ConnectionPool , nickname: string, 
     .input('iduser', sql.Int, usuario.recordset[0].id_usuario)
     .input('idroom', sql.Int, room.recordset[0].id_room)
     .input('estado', sql.TinyInt, 1)
-    .query(String(config.q1))
+    .query(String(config.q2_1))
     return result
 }

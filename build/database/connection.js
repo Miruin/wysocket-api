@@ -64,7 +64,7 @@ function getDatosJugador(p, nickname, codigo) {
             .input('iduser', mssql_1.default.Int, usuario.recordset[0].id_usuario)
             .input('idroom', mssql_1.default.Int, room.recordset[0].id_room)
             .input('estado', mssql_1.default.TinyInt, 1)
-            .query(String(config_1.default.q1));
+            .query(String(config_1.default.q2_1));
         return result;
     });
 }
