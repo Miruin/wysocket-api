@@ -32,7 +32,6 @@ wss.on("connection", (socket) => {
                             msg: 'error al mover datos en la DB'
                         }));
                     })
-                    pool.close()
                 })
                 .catch(err => {
                     console.error(err)
@@ -55,7 +54,6 @@ wss.on("connection", (socket) => {
                             cantJugadores: cant
                         }));
                     })
-                    pool.close()
                 })
                 .catch(err => {
                     console.error(err)
