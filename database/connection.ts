@@ -33,11 +33,30 @@ export async function jugadorCon(p: sql.ConnectionPool , nickname: string, codig
     const room = await p.request()
     .input('codigo', codigo)
     .query(String(config.q4));
-    const result = await p.request()
+    const player = await p.request()
     .input('iduser', sql.Int, usuario.recordset[0].id_usuario)
     .input('idroom', sql.Int, room.recordset[0].id_room)
+    .query(String(config.q2_2))
+    if (player.recordset.length != 0) {
+        if(player.recordset[0].estado_jugador == 0) {
+            await p.request()
+            .input('estado', sql.TinyInt, 1)
+            .input('iduser', sql.Int, usuario.recordset[0].id_usuario)
+            .input('idroom', sql.Int, room.recordset[0].id_room)
+            .query(String(config.q1_1))
+        }
+    } else {
+        await p.request()
+        .input('estado', sql.TinyInt, 1)
+        .input('iduser', sql.Int, usuario.recordset[0].id_usuario)
+        .input('idroom', sql.Int, room.recordset[0].id_room)
+        .query(String(config.q1))
+    }
+    const result = await p.request()
     .input('estado', sql.TinyInt, 1)
-    .query(String(config.q1))
+    .input('iduser', sql.Int, usuario.recordset[0].id_usuario)
+    .input('idroom', sql.Int, room.recordset[0].id_room)
+    .query(String(config.q2_1))
     return result
 }
 
@@ -49,7 +68,6 @@ export async function getDatosJugador(p: sql.ConnectionPool , nickname: string, 
     .input('codigo', codigo)
     .query(String(config.q4));
     const result = await p.request()
-    .input('iduser', sql.Int, usuario.recordset[0].id_usuario)
     .input('idroom', sql.Int, room.recordset[0].id_room)
     .input('estado', sql.TinyInt, 1)
     .query(String(config.q2_1))

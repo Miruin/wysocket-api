@@ -43,11 +43,31 @@ function jugadorCon(p, nickname, codigo) {
         const room = yield p.request()
             .input('codigo', codigo)
             .query(String(config_1.default.q4));
-        const result = yield p.request()
+        const player = yield p.request()
             .input('iduser', mssql_1.default.Int, usuario.recordset[0].id_usuario)
             .input('idroom', mssql_1.default.Int, room.recordset[0].id_room)
+            .query(String(config_1.default.q2_2));
+        if (player.recordset.length != 0) {
+            if (player.recordset[0].estado_jugador == 0) {
+                yield p.request()
+                    .input('estado', mssql_1.default.TinyInt, 1)
+                    .input('iduser', mssql_1.default.Int, usuario.recordset[0].id_usuario)
+                    .input('idroom', mssql_1.default.Int, room.recordset[0].id_room)
+                    .query(String(config_1.default.q1_1));
+            }
+        }
+        else {
+            yield p.request()
+                .input('estado', mssql_1.default.TinyInt, 1)
+                .input('iduser', mssql_1.default.Int, usuario.recordset[0].id_usuario)
+                .input('idroom', mssql_1.default.Int, room.recordset[0].id_room)
+                .query(String(config_1.default.q1));
+        }
+        const result = yield p.request()
             .input('estado', mssql_1.default.TinyInt, 1)
-            .query(String(config_1.default.q1));
+            .input('iduser', mssql_1.default.Int, usuario.recordset[0].id_usuario)
+            .input('idroom', mssql_1.default.Int, room.recordset[0].id_room)
+            .query(String(config_1.default.q2_1));
         return result;
     });
 }
@@ -61,7 +81,6 @@ function getDatosJugador(p, nickname, codigo) {
             .input('codigo', codigo)
             .query(String(config_1.default.q4));
         const result = yield p.request()
-            .input('iduser', mssql_1.default.Int, usuario.recordset[0].id_usuario)
             .input('idroom', mssql_1.default.Int, room.recordset[0].id_room)
             .input('estado', mssql_1.default.TinyInt, 1)
             .query(String(config_1.default.q2_1));
