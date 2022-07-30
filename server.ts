@@ -7,9 +7,12 @@ import { getcon, jugadorCon, getDatosJugador } from './database/connection';
 const p = process.env.PORT || 3000
 const wss = new WebSocketServer({port: Number(p)})
 wss.on("connection", (socket) => {
+
     socket.on("message", (data) => {
+
         const packet = JSON.parse(String(data));
         switch (packet.type) { 
+
             case "conectado":
                 getcon()
                 .then(pool => {
@@ -39,6 +42,7 @@ wss.on("connection", (socket) => {
                     }));
                 });
             break;
+            
             case "mantenerCon":
                 getcon()
                 .then(pool => {
