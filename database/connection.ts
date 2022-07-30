@@ -43,7 +43,7 @@ export async function jugadorCon(p: sql.ConnectionPool , nickname: string, codig
             .input('estado', sql.TinyInt, 1)
             .input('iduser', sql.Int, usuario.recordset[0].id_usuario)
             .input('idroom', sql.Int, room.recordset[0].id_room)
-            .query(String(config.q1_1))
+            .query(String(config.q1_1));
         }
     } else {
         await p.request()
@@ -56,20 +56,6 @@ export async function jugadorCon(p: sql.ConnectionPool , nickname: string, codig
     .input('estado', sql.TinyInt, 1)
     .input('iduser', sql.Int, usuario.recordset[0].id_usuario)
     .input('idroom', sql.Int, room.recordset[0].id_room)
-    .query(String(config.q2_1))
-    return result
-}
-
-export async function getDatosJugador(p: sql.ConnectionPool , nickname: string, codigo: number){
-    const usuario = await p.request()
-    .input('nick', nickname)
-    .query(String(config.q2));
-    const room = await p.request()
-    .input('codigo', codigo)
-    .query(String(config.q4));
-    const result = await p.request()
-    .input('idroom', sql.Int, room.recordset[0].id_room)
-    .input('estado', sql.TinyInt, 1)
     .query(String(config.q2_1))
     return result
 }

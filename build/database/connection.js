@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDatosJugador = exports.jugadorCon = exports.getcon = void 0;
+exports.jugadorCon = exports.getcon = void 0;
 const mssql_1 = __importDefault(require("mssql"));
 const config_1 = __importDefault(require("../config/config"));
 function getcon() {
@@ -72,19 +72,3 @@ function jugadorCon(p, nickname, codigo) {
     });
 }
 exports.jugadorCon = jugadorCon;
-function getDatosJugador(p, nickname, codigo) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const usuario = yield p.request()
-            .input('nick', nickname)
-            .query(String(config_1.default.q2));
-        const room = yield p.request()
-            .input('codigo', codigo)
-            .query(String(config_1.default.q4));
-        const result = yield p.request()
-            .input('idroom', mssql_1.default.Int, room.recordset[0].id_room)
-            .input('estado', mssql_1.default.TinyInt, 1)
-            .query(String(config_1.default.q2_1));
-        return result;
-    });
-}
-exports.getDatosJugador = getDatosJugador;
