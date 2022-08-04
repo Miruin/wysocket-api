@@ -2,7 +2,7 @@ import WebSocket, {WebSocketServer} from "ws"
 import sql from 'mssql';
 
 import config from './config/config'
-import { estadoReset, getcon, getScore, jugadorCon, jugadorDescon} from './database/connection';
+import { estadoReset, getcon, getScore, jugadorCon, jugadorDescon, scoreTotal} from './database/connection';
 
 const p = process.env.PORT || 3000
 const wss = new WebSocketServer({port: Number(p)})
@@ -154,6 +154,16 @@ wss.on("connection", socket => {
             break;
 
             case"terminar juego":
+                getcon().then(p =>{
+                    scoreTotal(p,u,Number(c))
+                    jugadorDescon(p,u,Number(c))
+                }).catch(err1 =>{
+                    console.error(err1);
+                    socket.send(JSON.stringify({
+                        type: 'error',
+                        msg: 'error al obtener pool' 
+                    }));
+                })
             break;
         }
     })

@@ -165,6 +165,16 @@ wss.on("connection", socket => {
                 });
                 break;
             case "terminar juego":
+                (0, connection_1.getcon)().then(p => {
+                    (0, connection_1.scoreTotal)(p, u, Number(c));
+                    (0, connection_1.jugadorDescon)(p, u, Number(c));
+                }).catch(err1 => {
+                    console.error(err1);
+                    socket.send(JSON.stringify({
+                        type: 'error',
+                        msg: 'error al obtener pool'
+                    }));
+                });
                 break;
         }
     });

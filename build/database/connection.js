@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.estadoReset = exports.getScore = exports.jugadorDescon = exports.jugadorCon = exports.getcon = void 0;
+exports.scoreTotal = exports.estadoReset = exports.getScore = exports.jugadorDescon = exports.jugadorCon = exports.getcon = void 0;
 const mssql_1 = __importDefault(require("mssql"));
 const config_1 = __importDefault(require("../config/config"));
 function getcon() {
@@ -135,3 +135,18 @@ function estadoReset(p, nickname, codigo) {
     });
 }
 exports.estadoReset = estadoReset;
+function scoreTotal(p, nickname, codigo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const usuario = yield getUsuario(p, nickname);
+        const room = yield getRoom(p, codigo);
+        const player = yield getPlayer(p, Number(usuario.recordset[0].id_usuario), Number(room.recordset[0].id_room));
+        let puntos = Number(usuario.recordset[0].scoretotal) + Number(player.recordset[0].score);
+        if (puntos <= 0)
+            puntos = 0;
+        yield p.request()
+            .input('puntos', mssql_1.default.Int, puntos)
+            .input('user', mssql_1.default.VarChar, nickname)
+            .query(String(config_1.default.q8));
+    });
+}
+exports.scoreTotal = scoreTotal;

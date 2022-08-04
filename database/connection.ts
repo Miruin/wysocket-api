@@ -112,3 +112,14 @@ export async function estadoReset(p: sql.ConnectionPool, nickname: string, codig
     const result = await getCant(p, room.recordset[0].id_room)
     return result
 }
+export async function scoreTotal(p: sql.ConnectionPool, nickname: string, codigo: number) {
+    const usuario = await getUsuario(p,nickname)
+    const room = await getRoom(p,codigo)
+    const player = await getPlayer(p,Number(usuario.recordset[0].id_usuario),Number(room.recordset[0].id_room))
+    let puntos = Number(usuario.recordset[0].scoretotal) + Number(player.recordset[0].score)
+    if(puntos <= 0) puntos = 0
+    await p.request()
+    .input('puntos', sql.Int, puntos)
+    .input('user', sql.VarChar, nickname)
+    .query(String(config.q8))
+}
