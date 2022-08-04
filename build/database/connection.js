@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.jugadorDescon = exports.jugadorCon = exports.getcon = void 0;
+exports.estadoReset = exports.getScore = exports.jugadorDescon = exports.jugadorCon = exports.getcon = void 0;
 const mssql_1 = __importDefault(require("mssql"));
 const config_1 = __importDefault(require("../config/config"));
 function getcon() {
@@ -51,14 +51,22 @@ function getRoom(p, codigo) {
         return room;
     });
 }
-function getCant(p, iduser, idroom) {
+function getCant(p, idroom) {
     return __awaiter(this, void 0, void 0, function* () {
         const result = yield p.request()
             .input('estado', mssql_1.default.TinyInt, 1)
-            .input('iduser', mssql_1.default.Int, iduser)
             .input('idroom', mssql_1.default.Int, idroom)
             .query(String(config_1.default.q2_1));
         return result;
+    });
+}
+function getPlayer(p, iduser, idroom) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const player = yield p.request()
+            .input('iduser', mssql_1.default.Int, iduser)
+            .input('idroom', mssql_1.default.Int, idroom)
+            .query(String(config_1.default.q5));
+        return player;
     });
 }
 function jugadorCon(p, nickname, codigo) {
@@ -69,23 +77,14 @@ function jugadorCon(p, nickname, codigo) {
             .input('iduser', mssql_1.default.Int, usuario.recordset[0].id_usuario)
             .input('idroom', mssql_1.default.Int, room.recordset[0].id_room)
             .query(String(config_1.default.q2_2));
-        if (player.recordset.length != 0) {
-            if (player.recordset[0].estado_jugador == 0) {
-                yield p.request()
-                    .input('estado', mssql_1.default.TinyInt, 1)
-                    .input('iduser', mssql_1.default.Int, usuario.recordset[0].id_usuario)
-                    .input('idroom', mssql_1.default.Int, room.recordset[0].id_room)
-                    .query(String(config_1.default.q1_1));
-            }
-        }
-        else {
+        if (player.recordset.length == 0) {
             yield p.request()
-                .input('estado', mssql_1.default.TinyInt, 1)
+                .input('estado', mssql_1.default.TinyInt, 0)
                 .input('iduser', mssql_1.default.Int, usuario.recordset[0].id_usuario)
                 .input('idroom', mssql_1.default.Int, room.recordset[0].id_room)
                 .query(String(config_1.default.q1));
         }
-        const result = yield getCant(p, usuario.recordset[0].id_usuario, room.recordset[0].id_room);
+        const result = yield getCant(p, room.recordset[0].id_room);
         return result;
     });
 }
@@ -95,12 +94,44 @@ function jugadorDescon(p, nickname, codigo) {
         const usuario = yield getUsuario(p, nickname);
         const room = yield getRoom(p, codigo);
         yield p.request()
-            .input('estado', mssql_1.default.TinyInt, 0)
             .input('iduser', mssql_1.default.Int, usuario.recordset[0].id_usuario)
             .input('idroom', mssql_1.default.Int, room.recordset[0].id_room)
             .query(String(config_1.default.q1_1));
-        const result = yield getCant(p, usuario.recordset[0].id_usuario, room.recordset[0].id_room);
+        const result = yield getCant(p, room.recordset[0].id_room);
         return result;
     });
 }
 exports.jugadorDescon = jugadorDescon;
+function getScore(p, nickname, codigo, puntos) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const usuario = yield getUsuario(p, nickname);
+        const room = yield getRoom(p, codigo);
+        const player = yield getPlayer(p, Number(usuario.recordset[0].id_usuario), Number(room.recordset[0].id_room));
+        let r = puntos + Number(player.recordset[0].score);
+        if (r <= 0)
+            r = 0;
+        yield p.request()
+            .input('puntos', mssql_1.default.Int, r)
+            .input('estado', mssql_1.default.TinyInt, 1)
+            .input('iduser', mssql_1.default.Int, usuario.recordset[0].id_usuario)
+            .input('idroom', mssql_1.default.Int, room.recordset[0].id_room)
+            .query(String(config_1.default.q6));
+        const result = yield getCant(p, room.recordset[0].id_room);
+        return result;
+    });
+}
+exports.getScore = getScore;
+function estadoReset(p, nickname, codigo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const usuario = yield getUsuario(p, nickname);
+        const room = yield getRoom(p, codigo);
+        yield p.request()
+            .input('estado', mssql_1.default.TinyInt, 0)
+            .input('iduser', mssql_1.default.Int, usuario.recordset[0].id_usuario)
+            .input('idroom', mssql_1.default.Int, room.recordset[0].id_room)
+            .query(String(config_1.default.q7));
+        const result = yield getCant(p, room.recordset[0].id_room);
+        return result;
+    });
+}
+exports.estadoReset = estadoReset;
